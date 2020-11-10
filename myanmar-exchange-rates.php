@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name:       Myanmar Currency Exchange Rates
+ * Plugin Name:       Myanmar Currency Exchange Rates by MWD
  * Plugin URI:        https://github.com/gtu-myowin/myanmar-exchange-rates
  * Description:       Myanmar daily foreign exchange (forex) rates WordPress plugin. This plugin gets daily exchange rates from Central Bank of Myanmar (CBM).
  * Version:           1.0
