@@ -1,0 +1,4 @@
+.mwd-mcer-field-currencies select {
+   min-width: 100px !important;
+   min-height: 100px !important;
+}
