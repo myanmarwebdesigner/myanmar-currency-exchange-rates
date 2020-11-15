@@ -2,7 +2,7 @@
 /**
  * Register all the actions and filters for the plugin
  * 
- * @link https://myanmarwebdesigner.com/
+ * @link https://myanmarwebdesigner.com
  * @since   1.0
  * 
  * @package Myanmar_Exchange_Rates
@@ -20,11 +20,14 @@
  * @subpackage Myanmar_Exchange_Rates/includes
  * @author  Myanmar Web Designer (MWD) Co., Ltd. 
  */
-class MyanmarExchangeRatesLoader
+
+defined( 'ABSPATH' ) || exit;
+
+class Myanmar_Exchange_Rates_Loader
 {
    /**
     * The array of actions registered with the Wordpress.
-
+    *
     * @since   1.0
     * @access  protected
     * @var  array $actions The actions registered with Wordpress to fire when the plugin loads.

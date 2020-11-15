@@ -51,6 +51,19 @@ function mwd_mcer_activate()
 }
 register_activation_hook(__FILE__, 'mwd_mcer_activate');
 
+
+   
+/**
+ * Register the new widget.
+ *
+ * @since   1.0
+ */
+function mwd_mcer_register_widgets()
+{
+   register_widget( 'MM_FX_Rates' );
+}
+add_action( 'widgets_init', 'mwd_mcer_register_widgets' );
+
 // When Deactivate the plugin
 function mwd_mcer_deactivate()
 {
@@ -69,7 +82,18 @@ register_activation_hook(__FILE__, 'mwd_mcer_deactivate');
  */
 function run_myanmar_exchange_rates()
 {
-   $plugin = new MyanmarExchangeRates();
-   $plugin->run();
+   $MCER = new Myanmar_Exchange_Rates();
+   $MCER->run();
 }
 run_myanmar_exchange_rates();
+
+/**
+ * Return the main instance of Myanmar_Exchange_Rates
+ * 
+ * @since   1.0
+ * @return  Myanmar_Exchange_Rates
+ */
+function MWD_MCER()
+{
+   return Myanmar_Exchange_Rates::instance();
+}

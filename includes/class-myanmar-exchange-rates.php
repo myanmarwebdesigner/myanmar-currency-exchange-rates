@@ -25,7 +25,7 @@ defined( 'ABSPATH' ) || exit;
  * @subpackage Myanmar_Exchange_Rates/includes
  * @author  Myanmar Web Designer (MWD) Co., Ltd. 
  */
-class MyanmarExchangeRates
+final class Myanmar_Exchange_Rates
 {
    /**
     * The loader that is responsible for maintaining and registering all hooks that 
@@ -36,6 +36,16 @@ class MyanmarExchangeRates
     * @var  MyanmarExchangeRatesLoader   $loader   Maintains and registers all hooks for the plugin.
     */
    protected $loader;
+
+   /**
+    * The single instance of the class.
+    * 
+    * @since   1.0
+    * @var  Myanmar_Exchange_Rates
+    * @static
+    * @access protected
+    */
+   protected static $_instance = null;
 
    /**
     * The unique identifier of the plugin.
@@ -63,6 +73,14 @@ class MyanmarExchangeRates
     * @var  array $currencies All currencies
     */
    protected $currencies;
+   
+   /**
+    * Exchange rates response body.
+    *
+    * @since   1.0
+    * @var  object  $fxrates_body Latest rates repsonse body.
+    */
+   protected $fxrates_body;
 
    /**
     * Define the core functionality of the plugin.
@@ -77,50 +95,10 @@ class MyanmarExchangeRates
          $this->version = '1.0';
 
       $this->plugin_name = 'myanmar-exchange-rates';
-      $this->currencies = array(
-         "USD",
-         "KES",
-         "KES",
-         "THB",
-         "PKR",
-         "CZK",
-         "JPY",
-         "SAR",
-         "LAK",
-         "HKD",
-         "BRL",
-         "LKR",
-         "NZD",
-         "CAD",
-         "GBP",
-         "PHP",
-         "KRW",
-         "VND",
-         "DKK",
-         "AUD",
-         "RSD",
-         "MYR",
-         "INR",
-         "BND",
-         "EUR",
-         "SEK",
-         "NOK",
-         "ILS",
-         "CNY",
-         "CHF",
-         "RUB",
-         "KWD",
-         "BDT",
-         "EGP",
-         "ZAR",
-         "NPR",
-         "IDR",
-         "KHR",
-         "SGD",
-      );
 
       $this->load_dependencies();
       $this->define_admin_hooks();
+      $this->load_exchage_rates();
    }
 
    /**
@@ -145,7 +123,10 @@ class MyanmarExchangeRates
       // The class responsible for defining widget
       require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/widgets/class-mm-fx-rates.php';
 
-      $this->loader = new MyanmarExchangeRatesLoader();
+      // The class responsible for defining widget
+      require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-cbm-exchange-rates.php';
+
+      $this->loader = new Myanmar_Exchange_Rates_Loader();
    }
 
    /**
@@ -157,12 +138,26 @@ class MyanmarExchangeRates
     */
    private function define_admin_hooks()
    {
-      $plugin_admin = new MyanmarExchangeRatesAdmin( $this->get_plugin_name(), $this->get_version(), $this->get_currencies() );
+      $plugin_admin = new Myanmar_Exchange_Rates_Admin( $this->get_plugin_name(), $this->get_version(), $this->currencies );
 
       $this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
       $this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
       $this->loader->add_action( 'admin_menu', $plugin_admin, 'mwd_mcer_option_page' );
       $this->loader->add_action( 'admin_init', $plugin_admin, 'mwd_mcer_settings_init' );
+   }
+
+   /**
+    * Load exchange rate
+
+    * @since   1.0
+    * @access  private
+    */
+   private function load_exchage_rates()
+   {
+      $exchane = new CBM_Exchange_Rates();
+
+      $this->fxrates_body = $exchane->get_fxrates_body();
+      $this->currencies = $exchane->get_currencies();
    }
 
    /**
@@ -173,6 +168,24 @@ class MyanmarExchangeRates
    public function run()
    {
       $this->loader->run();
+   }
+
+   /**
+    * Main Myanmar_Exchange_Rates instance.
+    *
+    * Ensure only one instance of Myanmar_Exchange_Rates is loaded and can be loaded.
+    * 
+    * @since   1.0
+    * @static
+    * @see  MWD_MCER()
+    * @return  Myanmar_Exchange_Rates  Min instance.
+    */
+   public static function instance()
+   {
+      if ( is_null( self::$_instance ) )
+         self::$_instance = new self();
+
+      return self::$_instance;
    }
 
    /**
@@ -210,10 +223,21 @@ class MyanmarExchangeRates
    }
 
    /**
-    * Retrieve the currencies list.
+    * Retrieve fxrates response body.
     *
     * @since   1.0
-    * @return  array Currencies
+    * @return  array Latest fxrates response body.
+    */
+   public function get_fxrates_body()
+   {
+      return $this->fxrates_body;
+   }
+
+   /**
+    * Retrieve currencies.
+    *
+    * @since   1.0
+    * @return  array Available currencies.
     */
    public function get_currencies()
    {

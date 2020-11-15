@@ -12,8 +12,13 @@ defined( 'ABSPATH' ) || exit;
 
 /**
  * Class for registering a new settings page under Settings.
+ * 
+ * @since   1.0
+ * @package Myanmar_Exchange_Rates
+ * @subpackage Myanmar_Exchange_Rates/admin
+ * @author  Myanmar Web Designer (MWD) Co., Ltd. 
  */
-class MyanmarExchangeRatesAdmin
+class Myanmar_Exchange_Rates_Admin
 {
    /**
     * The ID of the plugin.
@@ -32,15 +37,6 @@ class MyanmarExchangeRatesAdmin
     * @var string $version The current version of this plugin.
     */
    private $version;
-
-   /**
-    * The currencies list
-    *
-    * @since   1.0
-    * @access  protected
-    * @var  array $currencies All currencies
-    */
-   protected $currencies;
  
    /**
     * Initialize the class and set its properties
@@ -49,42 +45,25 @@ class MyanmarExchangeRatesAdmin
     * @param  string $plugin_name  The name of this plugin.
     * @param  string   $version The version of this plugin.
     */
-   public function __construct( $plugin_name, $version, $currencies )
+   public function __construct( $plugin_name, $version )
    {
       $this->plugin_name = $plugin_name;
       $this->version = $version;
-      $this->currencies = $currencies;
-
-      add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_styles' ) );
    }
  
-    /**
-     * Registers a new settings page under Settings.
-     */
-    function mwd_mcer_option_page() {
-        // Add plugin option page
-        $hookname = add_options_page(
-            __('Myanmar Currency Exchange Rates Options', 'myanmar-exchange-rates'),
-            __('Myanmar Exchange Rates', 'myanmar-exchange-rates'),
-            'manage_options',
-            'mwd_mcer',
-            [$this, 'mwd_mcer_options_page_html']  
-        );
-
-      //   // Handle form submit
-      //   add_action( 'load-' . $hookname, 'mwd_mcer_options_page_submit' );
-
-      //   // Form submit function
-      //   function mwd_mcer_options_page_submit()
-      //   {
-      //       // print_r($_POST);
-      //       if ('POST' === $_SERVER['REQUEST_METHOD'] && isset($_POST['_wpnonce']) && wp_verify_nonce($_POST['_wpnonce'], $_POST['action'])) {
-      //           return "Lorem ipsum dolor sit amet consectetur adipisicing elit. Eligendi esse facilis iusto aspernatur animi sit quidem voluptatibus quod commodi ratione qui aut error quas, nam totam reprehenderit dolorem consectetur quisquam?";
-      //       } else {
-      //           return 'failed';
-      //       }
-      //   }
-    }
+   /**
+    * Registers a new settings page under Settings.
+    */
+   function mwd_mcer_option_page() {
+      // Add plugin option page
+      $hookname = add_options_page(
+         __('Myanmar Currency Exchange Rates Options', 'myanmar-exchange-rates'),
+         __('Myanmar Exchange Rates', 'myanmar-exchange-rates'),
+         'manage_options',
+         'mwd_mcer',
+         [$this, 'mwd_mcer_options_page_html']  
+      );
+   }
  
    /**
     * Settings page display callback.
@@ -105,9 +84,6 @@ class MyanmarExchangeRatesAdmin
          // add settings saved message with the class of `updated`
          add_settings_error( 'mwd_mcer_messages', 'mwd_mcer_message', __( 'Settings Saved', 'myanmar-exchange-rates' ), 'updated' );
       }
-
-      // show error/update messages
-      // settings_errors( 'mwd_mcer_messages' );
       ?>
 
       <div class="wrap">
@@ -176,7 +152,7 @@ class MyanmarExchangeRatesAdmin
       <select name="mwd_mcer_options[<?php echo esc_attr( $args['label_for'] ); ?>][]"
        id="<?php echo esc_attr( $args['label_for'] ); ?>" multiple>
 
-        <?php foreach ( $this->currencies as $curr ) : ?>
+        <?php foreach ( MWD_MCER()->get_currencies() as $curr ) : ?>
 
             <option
                value="<?php esc_attr_e( $curr ); ?>"
@@ -197,7 +173,7 @@ class MyanmarExchangeRatesAdmin
     */
    public function mwd_mcer_section_choose_currency_callback( $arg )
    {
-      echo plugin_dir_url( __FILE__ ) . 'css/mwd-mcer-admin.css';
+      echo '';
    }
 
    /**
@@ -207,8 +183,6 @@ class MyanmarExchangeRatesAdmin
     */
    public function enqueue_styles()
    {
-      // wp_register_style( 'mwd-mcer-admin-styles', plugin_dir_url( __FILE__ ) . 'css/mwd-mcer-admin.css', array(), $this->version );
-      // wp_enqueue_style( 'mwd-mcer-admin-styles' );
       wp_enqueue_style( 'mwd-mcer-admin-styles', plugin_dir_url( __FILE__ ) . 'css/mwd-mcer-admin.css', array(), $this->version );
    }
 

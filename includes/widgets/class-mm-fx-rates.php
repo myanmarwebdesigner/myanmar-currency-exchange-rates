@@ -21,11 +21,11 @@
 
 defined( 'ABSPATH' ) || exit;
 
-if ( ! class_exists( 'mm_fx_rates' ) ) {
+if ( ! class_exists( 'MM_FX_Rates' ) ) {
 	/**
-	 * Class mm_fx_rates to register Widget
+	 * Class MM_FX_Rates to register Widget
 	 */
-   class mm_fx_rates extends WP_Widget
+   class MM_FX_Rates extends WP_Widget
    {
 		/**
 		 * Constructs the new widget.
@@ -38,7 +38,7 @@ if ( ! class_exists( 'mm_fx_rates' ) ) {
 				'mfr',
 				'Myanmar Currency Exchange Rates',
 				['description' => __( 'Myanmar Currency Exchange Rates', 'myanmar-exchange-rates' )],
-			);
+         );
 		}
 	
 		/**
@@ -55,19 +55,37 @@ if ( ! class_exists( 'mm_fx_rates' ) ) {
 			extract( $args );
 			$title = apply_filters( 'widget_title', $instance['title'] );
 	
-			// echo $before_widget;
+			echo $before_widget;
 			if ( ! empty( $title ) ) {
 				echo $before_title . $title . $after_title;
 			}
-			// echo $after_widget;
-			
-         $response = wp_remote_get( 'http://forex.cbm.gov.mm/api/latest' );
-			$body = wp_remote_retrieve_body( $response );
-			$fxrates = json_decode($body);
+         
+         // Get stored options
+         $currency_options = get_option( 'mwd_mcer_options' )['mwd_mcer_field_currencies'];
+         
+         $fxrates = array();
+         $rates = array();
+         $rates = MWD_MCER()->get_fxrates_body()->rates;
+         $rate_timestamp = MWD_MCER()->get_fxrates_body()->timestamp;
 
-			if ($fxrates != Null) {
+         foreach ( $currency_options as $option ) {
+            if ( isset( $rates->{$option} ) )
+               $fxrates[$option] = $rates->{$option};
+         }
+
+			if ( count( $fxrates ) > 0 ) {
+            // sort the $fxrates
+            if ( $instance['order'] === 'name_asc' || $instance['order'] === '--' ) {
+               ksort( $fxrates );
+            } elseif ( $instance['order'] === 'name_desc' ) {
+               krsort( $fxrates );
+            } elseif ( $instance['order'] === 'rates_asc' ) {
+               asort( $fxrates );
+            } elseif ( $instance['order'] === 'rates_desc' ) {
+               arsort( $fxrates );
+            }
 			?>
-				<p class="text-danger">Updated on <strong><?php echo date('j, F, Y', 1596096000) ?></strong></p>
+				<p class="text-danger"><strong><small>Updated on: <?php echo date( 'j, F, Y h:i:s A', $rate_timestamp ) ?></small></strong></p>
 				<table class="table table-striped">
 					<thead>
 						<tr>
@@ -76,38 +94,21 @@ if ( ! class_exists( 'mm_fx_rates' ) ) {
 						</tr>
 					</thead>
 					<tbody>
-						<tr>
-							<td><?php echo '1 USD'; ?></td>
-							<td><?php echo $fxrates->rates->USD; ?></td>
-						</tr>
-						<tr>
-							<td><?php echo '1 EUR'; ?></td>
-							<td><?php echo $fxrates->rates->EUR; ?></td>
-						</tr>
-						<tr>
-							<td><?php echo '1 SGD'; ?></td>
-							<td><?php echo $fxrates->rates->SGD; ?></td>
-						</tr>
-						<tr>
-							<td><?php echo '1 JPY'; ?></td>
-							<td><?php echo $fxrates->rates->JPY; ?></td>
-						</tr>
-						<tr>
-							<td><?php echo '1 THB'; ?></td>
-							<td><?php echo $fxrates->rates->THB; ?></td>
-						</tr>
-						<tr>
-							<td><?php echo '1 MYR'; ?></td>
-							<td><?php echo $fxrates->rates->MYR; ?></td>
-						</tr>
-						<tr>
-							<td><?php echo '1 AUD'; ?></td>
-							<td><?php echo $fxrates->rates->AUD; ?></td>
-						</tr>
+
+                  <?php foreach ( $fxrates as $key => $value ) : ?>
+
+                     <tr>
+                        <td><?php esc_html_e( '1 ' . $key ); ?></td>
+                        <td><?php esc_html_e( $value ); ?></td>
+                     </tr>
+
+                  <?php endforeach; ?>
+
 					</tbody>
 				</table>
 
-			<?php
+         <?php
+         echo $after_widget;
 			}
 		}
 
@@ -120,8 +121,12 @@ if ( ! class_exists( 'mm_fx_rates' ) ) {
 		 * @param array $old_instance The old instance of the widget.
 		 * @return array The updated instance of the widget.
 		 */
-		function update( $new_instance, $old_instance ) {
-			return $new_instance;
+		public function update( $new_instance, $old_instance ) {
+         $instance = array();
+         $instance['title'] = ( ! empty( $new_instance['title'] ) ) ? strip_tags( $new_instance['title']) : '';
+         $instance['order'] = ( ! empty( $new_instance['order'] ) ) ? strip_tags( $new_instance['order']) : '';
+
+			return $instance;
 		}
 	
 		/**
@@ -130,7 +135,7 @@ if ( ! class_exists( 'mm_fx_rates' ) ) {
 		 * @param array $instance The current widget settings.
 		 * @return string The HTML markup for the form.
 		 */
-		function form( $instance ) {
+		public function form( $instance ) {
 			if ( isset( $instance[ 'title' ] ) ) {
 				$title = $instance[ 'title' ];
 			}
@@ -142,14 +147,17 @@ if ( ! class_exists( 'mm_fx_rates' ) ) {
 					<label for="<?php echo $this->get_field_name( 'title' ); ?>"><?php _e( 'Title:' ); ?></label>
 					<input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>" />
 				</p>
+            <p>
+               <label for="<?php echo $this->get_field_id( 'order' ); ?>"><?php _e( 'Order by: ', 'myanmar-exchange-rates' ); ?></label>
+               <select name="<?php echo $this->get_field_name( 'order' ); ?>" id="<?php echo $this->get_field_id( 'order' ); ?>" class="widefat">
+                  <option value="--"><?php _e( '---' ); ?></option>
+                  <option value="name_asc" <?php echo ( $instance[ 'order' ] === 'name_asc' ) ? 'selected' : ''; ?>><?php _e( 'Name ASC', 'myanmar-exchange-rates' ); ?></option>
+                  <option value="name_desc" <?php echo ( $instance[ 'order' ] === 'name_desc' ) ? 'selected' : ''; ?>><?php _e( 'Name DESC', 'myanmar-exchange-rates' ); ?></option>
+                  <option value="rates_asc" <?php echo ( $instance[ 'order' ] === 'rates_asc' ) ? 'selected' : ''; ?>><?php _e( 'Rates ASC', 'myanmar-exchange-rates' ); ?></option>
+                  <option value="rates_desc" <?php echo ( $instance[ 'order' ] === 'rates_desc' ) ? 'selected' : ''; ?>><?php _e( 'Rates DESC', 'myanmar-exchange-rates' ); ?></option>
+               </select>
+            </p>
 			<?php
 		}
    }
-   
-   // Register the new widget.
-   function mwd_mcer_register_widgets()
-   {
-      register_widget( 'mm_fx_rates' );
-   }
-   add_action( 'widgets_init', 'mwd_mcer_register_widgets' );
 }
