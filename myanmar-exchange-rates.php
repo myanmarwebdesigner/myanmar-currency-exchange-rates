@@ -50,8 +50,6 @@ function mwd_mcer_activate()
 	mwd_mcer_register_widgets();
 }
 register_activation_hook(__FILE__, 'mwd_mcer_activate');
-
-
    
 /**
  * Register the new widget.

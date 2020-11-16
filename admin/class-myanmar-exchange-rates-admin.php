@@ -117,7 +117,7 @@ class Myanmar_Exchange_Rates_Admin
       // Register a new section in the 'mwd_mcer' page.
       add_settings_section(
          'mwd_mcer_section_choose_currency',
-         __( 'Select the currency to show', 'myanmar-exchange-rates'),
+         __( 'Select the currencies to show.', 'myanmar-exchange-rates'),
          array( $this, 'mwd_mcer_section_choose_currency_callback' ),
          'mwd_mcer'
       );
@@ -130,9 +130,7 @@ class Myanmar_Exchange_Rates_Admin
          'mwd_mcer',
          'mwd_mcer_section_choose_currency',
          array(
-            'label_for' => 'mwd_mcer_field_currencies',
-            'type'      => 'checkbox',
-            'option_group' => '',
+            'name'   => 'mwd_mcer_field_currencies',
             'class'  => 'mwd-mcer-field-currencies',
          ),
       );
@@ -145,23 +143,27 @@ class Myanmar_Exchange_Rates_Admin
     */
    public function mwd_mcer_field_currencies_callback( $args )
    {
-      // Get the value of the setting we've registered with register_setting()
+      // Get the value of the setting we've registered with register_setting().
       $options = get_option( 'mwd_mcer_options' );
+      $currency_options = ( ! isset( $options[$args['name']] ) || empty( $options[$args['name']] ) ) ? MWD_MCER()->cbm_exchange_rates()->get_default_currencies() : $options[$args['name']];
       ?>
+      
+      <fieldset>         
 
-      <select name="mwd_mcer_options[<?php echo esc_attr( $args['label_for'] ); ?>][]"
-       id="<?php echo esc_attr( $args['label_for'] ); ?>" multiple>
+        <?php foreach ( MWD_MCER()->cbm_exchange_rates()->get_currencies() as $currency ) : ?>
 
-        <?php foreach ( MWD_MCER()->get_currencies() as $curr ) : ?>
-
-            <option
-               value="<?php esc_attr_e( $curr ); ?>"
-               <?php echo ( in_array( $curr, $options[ $args['label_for'] ], TRUE ) ) ? ' selected ' : ''; ?>
-            ><?php esc_html_e( $curr, 'myanmar-currency-rates' ) ?></option>
+            <span class="form-group" style="margin-right: .5rem;">
+               <input type="checkbox" 
+                  name="mwd_mcer_options[<?php esc_attr_e( $args['name'] ) ?>][]" id="<?php esc_attr_e( strtolower( $currency ) ); ?>"
+                  value="<?php esc_attr_e( $currency ); ?>"
+                  <?php echo ( in_array( $currency, $currency_options, TRUE ) ) ? ' checked ' : ''; ?>
+               >
+               <label for="<?php esc_attr_e( strtolower( $currency ) ); ?>"><?php esc_html_e( $currency ); ?></label>
+            </span>
 
          <?php endforeach; ?>
 
-      </select>
+      </fieldset>
       
       <?php
    }

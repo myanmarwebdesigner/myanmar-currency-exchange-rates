@@ -25,13 +25,14 @@ defined( 'ABSPATH' ) || exit;
 class CBM_Exchange_Rates
 {
    /**
-    * latest exchange rates response body.
+    * The single instance of the class.
     *
     * @since   1.0
     * @access  protected
-    * @var  array  $fxrates Latest rates repsonse body.
+    * @static
+    * @var  CBM_Exchange_Rates
     */
-   protected $fxrates;
+   protected static $_instance = null;
    
    /**
     * Exchange rates response body.
@@ -52,18 +53,28 @@ class CBM_Exchange_Rates
    protected $currencies;
 
    /**
+    * The default currencies to show.
+    *
+    * @since   1.0
+    * @access  protected
+    * @var  array $default_currencies  Default currencies to show on public-side.
+    */
+   protected $default_currencies;
+
+   /**
     * Initialize the class and get latest exchange-rates
     *
     * @since   1.0
     */
    public function __construct()
    {
-      // Get rates
+      // Get latest exchange rates
       $response = wp_remote_get( 'http://forex.cbm.gov.mm/api/latest' );
       $body = wp_remote_retrieve_body( $response );
 
       $this->fxrates_body = json_decode( $body );
 
+      // All available currencies
       $this->currencies = array(
          "USD",
          "KES",
@@ -104,6 +115,34 @@ class CBM_Exchange_Rates
          "KHR",
          "SGD",
       );
+
+      // Default currencies to display.
+      $this->default_currencies = array(
+         'USD',
+         "EUR",
+         "THB",
+         "SGD",
+         "JPY",
+         "KRW",
+         "CNY",
+         "MYR",
+      );
+   }
+
+   /**
+    * CBM_Exchange_Rates instance.
+
+    * @since   1.0
+    * @static
+    * @return  CBM_Exchange_Rates
+    */
+   public static function instance()
+   {
+      if ( is_null( self::$_instance ) ) {
+         self::$_instance = new self();
+      }
+
+      return self::$_instance;
    }
 
    /**
@@ -126,5 +165,16 @@ class CBM_Exchange_Rates
    public function get_currencies()
    {
       return $this->currencies;
+   }
+
+   /**
+    * Retrieve the default currencies.
+    *
+    * @since   1.0
+    * @return  array Default currencies.
+    */
+   public function get_default_currencies()
+   {
+      return $this->default_currencies;
    }
 }

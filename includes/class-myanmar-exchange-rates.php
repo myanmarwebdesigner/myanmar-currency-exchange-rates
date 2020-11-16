@@ -54,7 +54,7 @@ final class Myanmar_Exchange_Rates
     * @access  protected
     * @var  string   $plugin_name   The string used to uniquely identify the plugin
     */
-   protected $plugin_name;
+   public $plugin_name;
 
    /**
     * The current version of the plugin.
@@ -63,24 +63,7 @@ final class Myanmar_Exchange_Rates
     * @access  protected
     * @var string $version The current version of the plugin.
     */
-   protected $version;
-
-   /**
-    * The currencies list
-    *
-    * @since   1.0
-    * @access  protected
-    * @var  array $currencies All currencies
-    */
-   protected $currencies;
-   
-   /**
-    * Exchange rates response body.
-    *
-    * @since   1.0
-    * @var  object  $fxrates_body Latest rates repsonse body.
-    */
-   protected $fxrates_body;
+   public $version;
 
    /**
     * Define the core functionality of the plugin.
@@ -98,7 +81,6 @@ final class Myanmar_Exchange_Rates
 
       $this->load_dependencies();
       $this->define_admin_hooks();
-      $this->load_exchage_rates();
    }
 
    /**
@@ -138,7 +120,7 @@ final class Myanmar_Exchange_Rates
     */
    private function define_admin_hooks()
    {
-      $plugin_admin = new Myanmar_Exchange_Rates_Admin( $this->get_plugin_name(), $this->get_version(), $this->currencies );
+      $plugin_admin = new Myanmar_Exchange_Rates_Admin( $this->get_plugin_name(), $this->get_version() );
 
       $this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
       $this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
@@ -147,17 +129,15 @@ final class Myanmar_Exchange_Rates
    }
 
    /**
-    * Load exchange rate
-
+    * Return the instance of CBM_Exchange_Rates.
+    *
     * @since   1.0
     * @access  private
+    * @return  CBM_Exchange_Rates  The instance of CBM_Exchange_Rates class.
     */
-   private function load_exchage_rates()
+   public function cbm_exchange_rates()
    {
-      $exchane = new CBM_Exchange_Rates();
-
-      $this->fxrates_body = $exchane->get_fxrates_body();
-      $this->currencies = $exchane->get_currencies();
+      return CBM_Exchange_Rates::instance();
    }
 
    /**

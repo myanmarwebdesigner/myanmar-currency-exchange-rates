@@ -61,13 +61,17 @@ if ( ! class_exists( 'MM_FX_Rates' ) ) {
 			}
          
          // Get stored options
-         $currency_options = get_option( 'mwd_mcer_options' )['mwd_mcer_field_currencies'];
+         $options = get_option( 'mwd_mcer_options' );
+         $currency_options = ( ! isset( $options['mwd_mcer_field_currencies'] ) || empty( $options['mwd_mcer_field_currencies'] ) ) ? MWD_MCER()->cbm_exchange_rates()->get_default_currencies() : $options['mwd_mcer_field_currencies'];
          
          $fxrates = array();
          $rates = array();
-         $rates = MWD_MCER()->get_fxrates_body()->rates;
-         $rate_timestamp = MWD_MCER()->get_fxrates_body()->timestamp;
 
+         $rates = MWD_MCER()->cbm_exchange_rates()->get_fxrates_body()->rates;
+         $rate_timestamp = MWD_MCER()->cbm_exchange_rates()->get_fxrates_body()->timestamp;
+
+         // filter $rates with $currency_options
+         // and add to $fxrates
          foreach ( $currency_options as $option ) {
             if ( isset( $rates->{$option} ) )
                $fxrates[$option] = $rates->{$option};
@@ -76,16 +80,36 @@ if ( ! class_exists( 'MM_FX_Rates' ) ) {
 			if ( count( $fxrates ) > 0 ) {
             // sort the $fxrates
             if ( $instance['order'] === 'name_asc' || $instance['order'] === '--' ) {
+
                ksort( $fxrates );
+
             } elseif ( $instance['order'] === 'name_desc' ) {
+
                krsort( $fxrates );
-            } elseif ( $instance['order'] === 'rates_asc' ) {
-               asort( $fxrates );
-            } elseif ( $instance['order'] === 'rates_desc' ) {
-               arsort( $fxrates );
+
+            } elseif ( ( $instance['order'] === 'rates_asc' ) || ( $instance['order'] === 'rates_desc' ) ) {
+
+               // Remove the `,`.
+               foreach( $fxrates as &$value ) {
+                  $value = str_replace( ',', '', $value );
+               }
+
+               if ( $instance['order'] === 'rates_asc' )
+                  // sort $fxrates.
+                  asort( $fxrates, SORT_NUMERIC );
+               else
+                  // reverse-sort $fxrates.
+                  arsort( $fxrates, SORT_NUMERIC );
+
+               // format the numbers
+               foreach( $fxrates as &$value ) {
+                  $value = number_format( $value, 4 );
+               }
             }
 			?>
-				<p class="text-danger"><strong><small>Updated on: <?php echo date( 'j, F, Y h:i:s A', $rate_timestamp ) ?></small></strong></p>
+				<p class="description">
+               <small>The Central Bank of Myanmar (CBM) updated this rates on GMT <span class="text-danger"><?php echo date( 'F j, Y - l g:i a', $rate_timestamp ) ?></span></small>
+            </p>
 				<table class="table table-striped">
 					<thead>
 						<tr>
