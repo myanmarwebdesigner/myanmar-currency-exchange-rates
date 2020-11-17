@@ -177,7 +177,7 @@ final class Myanmar_Exchange_Rates
     */
    public function get_plugin_name()
    {
-      return $this->get_plugin_name;
+      return $this->plugin_name;
    }
 
    /**
