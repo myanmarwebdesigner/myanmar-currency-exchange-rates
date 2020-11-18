@@ -109,11 +109,15 @@ if ( ! class_exists( 'MM_FX_Rates' ) ) {
 				<p class="description">
                <small>The Central Bank of Myanmar (CBM) updated this rates on GMT <span class="text-danger"><?php echo date( 'F j, Y - l g:i a', $rate_timestamp ) ?></span></small>
             </p>
-				<table class="table table-striped">
+				<table style="border-collapse:collapse;">
 					<thead>
-						<tr>
-							<th scope="col">Currency</th>
-							<th scope="col">MMK</th>
+						<tr style="border:0;">
+                     <th style="padding:10px 16px;border:1px solid #ddd;line-height:normal;font-size:16px;font-weight:bold;">
+                        Currency
+                     </th>
+                     <th style="padding:10px 16px;border:1px solid #ddd;line-height:normal;font-size:16px;font-weight:bold;">
+                        MMK
+                     </th>
 						</tr>
 					</thead>
 					<tbody>
@@ -126,9 +130,13 @@ if ( ! class_exists( 'MM_FX_Rates' ) ) {
                      foreach ( $fxrates as $key => $value ) :
                      ?>
    
-                        <tr>
-                           <td style="padding:.5rem;"><?php echo esc_html( '1 ' . $key ); ?></td>
-                           <td style="padding:.5rem;"><?php echo esc_html( $value ); ?></td>
+                        <tr style="border:0;">
+                           <td style="padding:8px 16px;border:1px solid #ddd;line-height:normal;font-size:15px;font-weight:400;">
+                              <?php echo esc_html( '1 ' . $key ); ?>
+                           </td>
+                           <td style="padding:8px 16px;border:1px solid #ddd;line-height:normal;font-size:15px;font-weight:400;">
+                              <?php echo esc_html( $value ); ?>
+                           </td>
                         </tr>
    
                      <?php
@@ -140,12 +148,16 @@ if ( ! class_exists( 'MM_FX_Rates' ) ) {
                      foreach ( $fxrates as $key => $value ) :
                      ?>
 
-                        <tr>
-                           <td>
-                              <span><?php echo esc_html( '1 ' . $key ); ?></span><br>
-                              <small><?php echo esc_html( $fxcurrencies[$key] ); ?></small>
+                        <tr style="border:0;">
+                           <td style="padding:5px 16px;border:1px solid #ddd;line-height:normal;">
+                              <span style="display:inline-block;width: 100%;font-size:15px;font-weight:400;">
+                                 <?php echo esc_html( '1 ' . $key ); ?>
+                              </span>
+                              <small style="font-size:12px;font-weight:400;"><?php echo esc_html( $fxcurrencies[$key] ); ?></small>
                            </td>
-                           <td><?php echo esc_html( $value ); ?></td>
+                           <td style="padding:5px 16px;border:1px solid #ddd;line-height:normal;font-size:15px;font-weight:400;">
+                              <?php echo esc_html( $value ); ?>
+                           </td>
                         </tr>
 
                      <?php

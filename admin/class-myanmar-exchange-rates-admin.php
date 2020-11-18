@@ -58,7 +58,7 @@ class Myanmar_Exchange_Rates_Admin
       // Add plugin option page
       $hookname = add_options_page(
          __('Myanmar Currency Exchange Rates Options', 'myanmar-exchange-rates'),
-         __('Myanmar Exchange Rates', 'myanmar-exchange-rates'),
+         __('Myanmar Currency Exchange Rates', 'myanmar-exchange-rates'),
          'manage_options',
          'mwd_mcer',
          [$this, 'mwd_mcer_options_page_html']  
@@ -186,14 +186,14 @@ class Myanmar_Exchange_Rates_Admin
 
         <?php foreach ( MWD_MCER()->cbm_exchange_rates()->get_currencies() as $currency ) : ?>
 
-            <span class="form-group" style="margin-right: .5rem;">
+            <div class="form-group" style="display: inline-block;margin-right: 10px;">
                <input type="checkbox" 
                   name="mwd_mcer_options[<?php esc_attr_e( $args['name'] ) ?>][]" id="<?php esc_attr_e( strtolower( $currency ) ); ?>"
                   value="<?php esc_attr_e( $currency ); ?>"
                   <?php echo ( in_array( $currency, $currency_options, TRUE ) ) ? ' checked ' : ''; ?>
                >
                <label for="<?php esc_attr_e( strtolower( $currency ) ); ?>"><?php esc_html_e( $currency ); ?></label>
-            </span>
+            </div>
 
          <?php endforeach; ?>
 
@@ -210,20 +210,11 @@ class Myanmar_Exchange_Rates_Admin
    public function mwd_mcer_field_display_modes_callback( $args )
    {
       $options = get_option( 'mwd_mcer_options' );
-      $modes = ( ! empty( $options[$args['name']] ) ) ? $options[$args['name']] : 'compact';
+      $modes = ( ! empty( $options[$args['name']] ) ) ? $options[$args['name']] : 'normal';
       ?>
 
       <fieldset>
-         <div class="form-group">
-            <input type="radio" 
-               name="mwd_mcer_options[<?php echo esc_attr( $args['name'] ); ?>]" 
-               id="compact" 
-               value="compact"
-               <?php echo ( $modes === 'compact' ) ? ' checked ' : '' ; ?>
-            >
-            <label for="compact"><?php _e( 'Compact', 'myanmar-exchange-rates' ); ?></label>
-         </div>
-         <div class="form-group">
+         <div class="form-group" style="display: inline-block;margin-right: 16px">
             <input type="radio" 
                name="mwd_mcer_options[<?php echo esc_attr( $args['name'] ); ?>]" 
                id="normal" 
@@ -231,6 +222,15 @@ class Myanmar_Exchange_Rates_Admin
                <?php echo ( $modes === 'normal' ) ? ' checked ' : '' ; ?>
             >
             <label for="normal"><?php _e( 'Normal', 'myanmar-exchange-rates' ); ?></label>
+         </div>
+         <div class="form-group" style="display: inline-block;margin-right: 16px">
+            <input type="radio" 
+               name="mwd_mcer_options[<?php echo esc_attr( $args['name'] ); ?>]" 
+               id="compact" 
+               value="compact"
+               <?php echo ( $modes === 'compact' ) ? ' checked ' : '' ; ?>
+            >
+            <label for="compact"><?php _e( 'Compact', 'myanmar-exchange-rates' ); ?></label>
          </div>
       </fieldset>
 
