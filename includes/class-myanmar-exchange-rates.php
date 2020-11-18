@@ -201,26 +201,4 @@ final class Myanmar_Exchange_Rates
    {
       return $this->loader;
    }
-
-   /**
-    * Retrieve fxrates response body.
-    *
-    * @since   1.0
-    * @return  array Latest fxrates response body.
-    */
-   public function get_fxrates_body()
-   {
-      return $this->fxrates_body;
-   }
-
-   /**
-    * Retrieve currencies.
-    *
-    * @since   1.0
-    * @return  array Available currencies.
-    */
-   public function get_currencies()
-   {
-      return $this->currencies;
-   }
 }

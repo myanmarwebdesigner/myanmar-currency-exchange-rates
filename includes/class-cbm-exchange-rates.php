@@ -39,9 +39,18 @@ class CBM_Exchange_Rates
     *
     * @since   1.0
     * @access  protected
-    * @var  object  $fxrates_body Latest rates repsonse body.
+    * @var  array  $fxrates_body Latest rates repsonse body.
     */
    protected $fxrates_body;
+   
+   /**
+    * Exchange-currencies.
+    *
+    * @since   1.0
+    * @access  protected
+    * @var  array  $fxcurrencies Latest-currencies.
+    */
+   protected $fxcurrencies;
    
    /**
    * The currencies list
@@ -68,11 +77,8 @@ class CBM_Exchange_Rates
     */
    public function __construct()
    {
-      // Get latest exchange rates
-      $response = wp_remote_get( 'http://forex.cbm.gov.mm/api/latest' );
-      $body = wp_remote_retrieve_body( $response );
-
-      $this->fxrates_body = json_decode( $body );
+      $this->fxrates_body = $this->get_latest_fxrates_body();
+      $this->fxcurrencies = $this->get_latest_fxcurrencies();
 
       // All available currencies
       $this->currencies = array(
@@ -123,9 +129,8 @@ class CBM_Exchange_Rates
          "THB",
          "SGD",
          "JPY",
-         "KRW",
-         "CNY",
          "MYR",
+         'AUD',
       );
    }
 
@@ -146,6 +151,79 @@ class CBM_Exchange_Rates
    }
 
    /**
+    * Get latest exchange-rates
+    * from `Central Banks of Myanmar`.
+    *
+    * @since   1.0
+    * @access  private
+    * @return  array If ok Retrun response body array, else empty array.
+    */
+   private function get_latest_fxrates_body()
+   {
+      // latest exchange-rates.
+      $fxrates_body = array();
+
+      // Get latest exchange-rates
+      $response = wp_remote_get( 'http://forex.cbm.gov.mm/api/latest' );
+      $body = wp_remote_retrieve_body( $response );
+
+      if ( ! empty( $body ) ) {
+         // Decode to PHP associative array.
+         $fxrates_body = json_decode( $body, true );
+         
+         // Check and update if $rates_body is update.
+         $option_latest_fxrates = get_option( 'mwd_mcer_latest_fxrates', '' ) ;
+
+         if ( empty( $option_latest_fxrates ) ) {
+            add_option( 'mwd_mcer_latest_fxrates', $fxrates_body );
+         } elseif ( $fxrates_body['timestamp'] > $option_latest_fxrates['timestamp'] ) {
+            update_option( 'mwd_mcer_latest_fxrates', $fxrates_body );
+         }
+      } else {
+         // Get option-response-body.
+         $fxrates_body = get_option( 'mwd_mcer_latest_fxrates', array() ) ;
+      }
+
+      return $fxrates_body;
+   }
+
+   /**
+    * Get the exchange-currencies
+    * from the `Central Banks of Myanmar`.
+    *
+    * @since   1.0
+    * @access  private
+    * @return  array If exist return the exchange-currencies else empty array.
+    */
+   private function get_latest_fxcurrencies()
+   {
+      // Exchange currencies.
+      $fxcurrencies = array();
+
+      $response = wp_remote_get( 'https://forex.cbm.gov.mm/api/currencies' );
+      $body = wp_remote_retrieve_body( $response );
+      
+      if ( ! empty( $body ) ) {
+         // Decode to PHP associative array.
+         $fxcurrencies = json_decode( $body, true )['currencies'];
+
+         // Retrieve stored `fxcurrencies`.
+         $option_fxcurrencies = get_option( 'mwd_mcer_fxcurrencies', '' );
+
+         if ( empty( $option_fxcurrencies ) ) {
+            add_option( 'mwd_mcer_fxcurrencies', $fxcurrencies );
+         } elseif ( count( array_diff_assoc( $fxcurrencies, $option_fxcurrencies ) ) > 0 ) {
+            update_option( 'mwd_mcer_fxcurrencies', $fxcurrencies );
+         }
+      } else {
+         // Retrieve stored `fxcurrencies`.
+         $fxcurrencies = get_option( 'mwd_mcer_fxcurrencies', array() );
+      }
+      
+      return $fxcurrencies;
+   }
+
+   /**
     * Retrieve fxrates.
     *
     * @since   1.0
@@ -154,6 +232,18 @@ class CBM_Exchange_Rates
    public function get_fxrates_body()
    {
       return $this->fxrates_body;
+   }
+
+   /**
+    * Retrieve fxcurrencies.
+    *
+    * @since   1.0
+    * @see  CBM_Exchange_Rates::get_latest_fxcurrencies()
+    * @return  array The fxcurrencies array.
+    */
+   public function get_fxcurrencies()
+   {
+      return $this->fxcurrencies;
    }
 
    /**

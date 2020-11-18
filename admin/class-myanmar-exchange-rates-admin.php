@@ -114,18 +114,29 @@ class Myanmar_Exchange_Rates_Admin
       // register a new setting for 'mwd_mcer' page.
       register_setting( 'mwd_mcer', 'mwd_mcer_options' );
 
-      // Register a new section in the 'mwd_mcer' page.
+      // Register a new section in the 'mwd_mcer' page
+      // Choose display mode section.
       add_settings_section(
-         'mwd_mcer_section_choose_currency',
-         __( 'Select the currencies to show.', 'myanmar-exchange-rates'),
-         array( $this, 'mwd_mcer_section_choose_currency_callback' ),
+         'mwd_mcer_section_display_modes',
+         __( 'Choose display mode.', 'myanmar-exchange-rates' ),
+         [ $this, 'mwd_mcer_section_display_modes_callback' ],
          'mwd_mcer'
       );
 
-      // Add new field to the section of 'mwd_mcer' page.
+      // Register a new section in the 'mwd_mcer' page
+      // Select currencies to show section.
+      add_settings_section(
+         'mwd_mcer_section_choose_currency',
+         __( 'Select the currencies to show.', 'myanmar-exchange-rates'),
+         [ $this, 'mwd_mcer_section_choose_currency_callback' ],
+         'mwd_mcer'
+      );
+
+      // Add new field to the section of 'mwd_mcer' page
+      // Select currencies field.
       add_settings_field(
          'mwd_mcer_field_currencies',
-         esc_html( 'Select Currencies', 'myanmar-exchange-rates' ),
+         __( 'Select Currencies', 'myanmar-exchange-rates' ),
          [ $this, 'mwd_mcer_field_currencies_callback' ],
          'mwd_mcer',
          'mwd_mcer_section_choose_currency',
@@ -133,6 +144,20 @@ class Myanmar_Exchange_Rates_Admin
             'name'   => 'mwd_mcer_field_currencies',
             'class'  => 'mwd-mcer-field-currencies',
          ),
+      );
+
+      // Add new field to the section of 'mwd_mcer' page
+      // Display modes field.
+      add_settings_field(
+         'mwd_mcer_field_display_modes',
+         __( 'Display Modes', 'myanmar-exchange-rates' ),
+         [ $this, 'mwd_mcer_field_display_modes_callback' ],
+         'mwd_mcer',
+         'mwd_mcer_section_display_modes',
+         array(
+            'name'   => 'mwd_mcer_field_display_modes',
+            'class'  => 'mwd-mcer-field-display-modes',
+         )
       );
    }
 
@@ -147,6 +172,15 @@ class Myanmar_Exchange_Rates_Admin
       $options = get_option( 'mwd_mcer_options' );
       $currency_options = ( ! isset( $options[$args['name']] ) || empty( $options[$args['name']] ) ) ? MWD_MCER()->cbm_exchange_rates()->get_default_currencies() : $options[$args['name']];
       ?>
+
+      <p style="margin-bottom:1rem;">
+         <input type="checkbox" 
+            name="" 
+            id="all-currencies"
+            <?php echo ( count( MWD_MCER()->cbm_exchange_rates()->get_currencies() ) == count( $currency_options ) ) ? ' checked ' : '' ?>
+         >
+         <label for="all-currencies"><?php _e( 'All', 'myanmar-exchange-rates' ); ?></label>
+      </p>
       
       <fieldset>         
 
@@ -169,11 +203,56 @@ class Myanmar_Exchange_Rates_Admin
    }
 
    /**
+    * Display-modes field callback of `mwd_mcer` page.
+    *
+    * @since   1.0
+    */
+   public function mwd_mcer_field_display_modes_callback( $args )
+   {
+      $options = get_option( 'mwd_mcer_options' );
+      $modes = ( ! empty( $options[$args['name']] ) ) ? $options[$args['name']] : 'compact';
+      ?>
+
+      <fieldset>
+         <div class="form-group">
+            <input type="radio" 
+               name="mwd_mcer_options[<?php echo esc_attr( $args['name'] ); ?>]" 
+               id="compact" 
+               value="compact"
+               <?php echo ( $modes === 'compact' ) ? ' checked ' : '' ; ?>
+            >
+            <label for="compact"><?php _e( 'Compact', 'myanmar-exchange-rates' ); ?></label>
+         </div>
+         <div class="form-group">
+            <input type="radio" 
+               name="mwd_mcer_options[<?php echo esc_attr( $args['name'] ); ?>]" 
+               id="normal" 
+               value="normal"
+               <?php echo ( $modes === 'normal' ) ? ' checked ' : '' ; ?>
+            >
+            <label for="normal"><?php _e( 'Normal', 'myanmar-exchange-rates' ); ?></label>
+         </div>
+      </fieldset>
+
+      <?php
+   }
+
+   /**
     * Setting section callback of 'mwd_mcer' page
     *
     * @since   1.0
     */
    public function mwd_mcer_section_choose_currency_callback( $arg )
+   {
+      echo '';
+   }
+
+   /**
+    * Choose display mode setting-section. 
+    *
+    * @since   1.0
+    */
+   public function mwd_mcer_section_display_modes_callback( $args )
    {
       echo '';
    }
