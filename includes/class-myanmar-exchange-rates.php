@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The file that defines the core plugin class
  * 
@@ -9,7 +10,7 @@
  * @subpackage Myanmar_Exchange_Rates/includes
  */
 
-defined( 'ABSPATH' ) || exit;
+defined('ABSPATH') || exit;
 
 /**
  * The core plugin class
@@ -72,12 +73,12 @@ final class Myanmar_Exchange_Rates
     */
    public function __construct()
    {
-      if ( defined( 'MYANMAR_EXCHANGE_RATES_VERSION' ) )
+      if (defined('MYANMAR_EXCHANGE_RATES_VERSION'))
          $this->version = MYANMAR_EXCHANGE_RATES_VERSION;
       else
          $this->version = '1.0';
 
-      $this->plugin_name = 'myanmar-exchange-rates';
+      $this->plugin_name = 'myanmar-currency-exchange-rates';
 
       $this->load_dependencies();
       $this->define_admin_hooks();
@@ -97,16 +98,16 @@ final class Myanmar_Exchange_Rates
        * The class responsible for orchestrating the actions and filters of
        * the core plugin.
        */
-      require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-myanmar-exchange-rates-loader.php';
+      require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-myanmar-exchange-rates-loader.php';
 
       // The class responsible for defining all actions that occurs in the admin area.
-      require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-myanmar-exchange-rates-admin.php';
+      require_once plugin_dir_path(dirname(__FILE__)) . 'admin/class-myanmar-exchange-rates-admin.php';
 
       // The class responsible for defining widget
-      require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/widgets/class-mm-fx-rates.php';
+      require_once plugin_dir_path(dirname(__FILE__)) . 'includes/widgets/class-mm-fx-rates.php';
 
       // The class responsible for defining widget
-      require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-cbm-exchange-rates.php';
+      require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-cbm-exchange-rates.php';
 
       $this->loader = new Myanmar_Exchange_Rates_Loader();
    }
@@ -120,12 +121,12 @@ final class Myanmar_Exchange_Rates
     */
    private function define_admin_hooks()
    {
-      $plugin_admin = new Myanmar_Exchange_Rates_Admin( $this->get_plugin_name(), $this->get_version() );
+      $plugin_admin = new Myanmar_Exchange_Rates_Admin($this->get_plugin_name(), $this->get_version());
 
-      $this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
-      $this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
-      $this->loader->add_action( 'admin_menu', $plugin_admin, 'mwd_mcer_option_page' );
-      $this->loader->add_action( 'admin_init', $plugin_admin, 'mwd_mcer_settings_init' );
+      $this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_styles');
+      $this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts');
+      $this->loader->add_action('admin_menu', $plugin_admin, 'mwd_mcer_option_page');
+      $this->loader->add_action('admin_init', $plugin_admin, 'mwd_mcer_settings_init');
    }
 
    /**
@@ -162,7 +163,7 @@ final class Myanmar_Exchange_Rates
     */
    public static function instance()
    {
-      if ( is_null( self::$_instance ) )
+      if (is_null(self::$_instance))
          self::$_instance = new self();
 
       return self::$_instance;
