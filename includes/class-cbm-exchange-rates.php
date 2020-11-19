@@ -46,20 +46,13 @@ class CBM_Exchange_Rates
    /**
     * Exchange-currencies.
     *
+    * An associative array key of three-letter currency code and array value of long country name.
+    *
     * @since   1.0
     * @access  protected
     * @var  array  $fxcurrencies Latest-currencies.
     */
    protected $fxcurrencies;
-   
-   /**
-   * The currencies list
-   *
-   * @since   1.0
-   * @access  protected
-   * @var  array $currencies All available currencies
-   */
-   protected $currencies;
 
    /**
     * The default currencies to show.
@@ -80,48 +73,6 @@ class CBM_Exchange_Rates
       $this->fxrates_body = $this->get_latest_fxrates_body();
       $this->fxcurrencies = $this->get_latest_fxcurrencies();
 
-      // All available currencies
-      $this->currencies = array(
-         "USD",
-         "KES",
-         "THB",
-         "PKR",
-         "CZK",
-         "JPY",
-         "SAR",
-         "LAK",
-         "HKD",
-         "BRL",
-         "LKR",
-         "NZD",
-         "CAD",
-         "GBP",
-         "PHP",
-         "KRW",
-         "VND",
-         "DKK",
-         "AUD",
-         "RSD",
-         "MYR",
-         "INR",
-         "BND",
-         "EUR",
-         "SEK",
-         "NOK",
-         "ILS",
-         "CNY",
-         "CHF",
-         "RUB",
-         "KWD",
-         "BDT",
-         "EGP",
-         "ZAR",
-         "NPR",
-         "IDR",
-         "KHR",
-         "SGD",
-      );
-
       // Default currencies to display.
       $this->default_currencies = array(
          'USD',
@@ -136,7 +87,7 @@ class CBM_Exchange_Rates
 
    /**
     * CBM_Exchange_Rates instance.
-
+    *
     * @since   1.0
     * @static
     * @return  CBM_Exchange_Rates
@@ -160,31 +111,27 @@ class CBM_Exchange_Rates
     */
    private function get_latest_fxrates_body()
    {
-      // latest exchange-rates.
-      $fxrates_body = array();
-
-      // Get latest exchange-rates
+      // Get latest exchange-rates from the Central Banks of Myanmar.
       $response = wp_remote_get( 'http://forex.cbm.gov.mm/api/latest' );
-      $body = wp_remote_retrieve_body( $response );
+      $response_code = wp_remote_retrieve_response_code( $response );      
+      $response_body = wp_remote_retrieve_body( $response );
 
-      if ( ! empty( $body ) ) {
-         // Decode to PHP associative array.
-         $fxrates_body = json_decode( $body, true );
+      if ( $response_code === 200 ) {
+         // Decode to PHP's associative array.
+         $response_body = json_decode( $response_body, true );
          
-         // Check and update if $rates_body is update.
-         $option_latest_fxrates = get_option( 'mwd_mcer_latest_fxrates', '' ) ;
+         // Check and update if $response_body is up to date.
+         $option_timestamp = get_option( 'mwd_mcer_latest_fxrates' ) ? get_option( 'mwd_mcer_latest_fxrates' )['timestamp'] : '';
 
-         if ( empty( $option_latest_fxrates ) ) {
-            add_option( 'mwd_mcer_latest_fxrates', $fxrates_body );
-         } elseif ( $fxrates_body['timestamp'] > $option_latest_fxrates['timestamp'] ) {
-            update_option( 'mwd_mcer_latest_fxrates', $fxrates_body );
+         if ( $option_timestamp != $response_body['timestamp'] ) {
+            update_option( 'mwd_mcer_latest_fxrates', $response_body );
          }
       } else {
          // Get option-response-body.
-         $fxrates_body = get_option( 'mwd_mcer_latest_fxrates', array() ) ;
+         $response_body = get_option( 'mwd_mcer_latest_fxrates', array() ) ;
       }
 
-      return $fxrates_body;
+      return $response_body;
    }
 
    /**
@@ -197,22 +144,19 @@ class CBM_Exchange_Rates
     */
    private function get_latest_fxcurrencies()
    {
-      // Exchange currencies.
-      $fxcurrencies = array();
-
+      // Get the latest currencies from Central Banks of Myanmar.
       $response = wp_remote_get( 'https://forex.cbm.gov.mm/api/currencies' );
-      $body = wp_remote_retrieve_body( $response );
+      $response_code = wp_remote_retrieve_response_code( $response );      
+      $response_body = wp_remote_retrieve_body( $response );
       
-      if ( ! empty( $body ) ) {
+      if ( $response_code === 200 ) {
          // Decode to PHP associative array.
-         $fxcurrencies = json_decode( $body, true )['currencies'];
+         $fxcurrencies = isset( json_decode( $response_body, true )['currencies'] ) ? json_decode( $response_body, true )['currencies'] : array();
 
          // Retrieve stored `fxcurrencies`.
-         $option_fxcurrencies = get_option( 'mwd_mcer_fxcurrencies', '' );
+         $option_fxcurrencies = get_option( 'mwd_mcer_fxcurrencies', array() );
 
-         if ( empty( $option_fxcurrencies ) ) {
-            add_option( 'mwd_mcer_fxcurrencies', $fxcurrencies );
-         } elseif ( count( array_diff_assoc( $fxcurrencies, $option_fxcurrencies ) ) > 0 ) {
+         if ( count( array_diff_assoc( $fxcurrencies, $option_fxcurrencies ) ) > 0 ) {
             update_option( 'mwd_mcer_fxcurrencies', $fxcurrencies );
          }
       } else {
@@ -224,10 +168,10 @@ class CBM_Exchange_Rates
    }
 
    /**
-    * Retrieve fxrates.
+    * Retrieve latest exchange-rates response body.
     *
     * @since   1.0
-    * @return  array Latest fxrates.
+    * @return  array An PHP's associative array of fxrates responsed body.
     */
    public function get_fxrates_body()
    {
@@ -247,14 +191,25 @@ class CBM_Exchange_Rates
    }
 
    /**
-    * Retrieve currencies.
+    * Retrieve latest exchange-rates.
     *
     * @since   1.0
-    * @return  array Available currencies.
+    * @return  array An PHP's associative array of fxrates, or empty array.
     */
-   public function get_currencies()
+   public function get_fxrates()
    {
-      return $this->currencies;
+      return ( ! empty( $this->fxrates_body['rates'] ) ) ? $this->fxrates_body['rates'] : array();
+   }
+
+   /**
+    * Retrieve latest exchange-rates timestamp.
+    *
+    * @since   1.0
+    * @return  string The latest timestamp, or empty string.
+    */
+   public function get_fxtimestamp()
+   {
+      return ( ! empty( $this->fxrates_body['timestamp'] ) ) ? $this->fxrates_body['timestamp'] : '';
    }
 
    /**
