@@ -168,6 +168,9 @@ class Myanmar_Exchange_Rates_Admin
     */
    public function mwd_mcer_field_currencies_callback( $args )
    {
+      // Latest exchange-rates.
+      $fxrates = MWD_MCER()->cbm_exchange_rates()->get_fxrates();
+
       // Get the value of the setting we've registered with register_setting().
       $options = get_option( 'mwd_mcer_options' );
       $currency_options = ( ! isset( $options[$args['name']] ) || empty( $options[$args['name']] ) ) ? MWD_MCER()->cbm_exchange_rates()->get_default_currencies() : $options[$args['name']];
@@ -177,14 +180,14 @@ class Myanmar_Exchange_Rates_Admin
          <input type="checkbox" 
             name="" 
             id="all-currencies"
-            <?php echo ( count( MWD_MCER()->cbm_exchange_rates()->get_currencies() ) == count( $currency_options ) ) ? ' checked ' : '' ?>
+            <?php echo ( count( $fxrates ) == count( $currency_options ) ) ? ' checked ' : '' ?>
          >
          <label for="all-currencies"><?php _e( 'All', 'myanmar-exchange-rates' ); ?></label>
       </p>
       
       <fieldset>         
 
-        <?php foreach ( MWD_MCER()->cbm_exchange_rates()->get_currencies() as $currency ) : ?>
+        <?php foreach ( $fxrates as $currency => $value ) : ?>
 
             <div class="form-group" style="display: inline-block;margin-right: 10px;">
                <input type="checkbox" 

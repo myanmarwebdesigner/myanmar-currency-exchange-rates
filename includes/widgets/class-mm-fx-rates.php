@@ -62,45 +62,46 @@ if ( ! class_exists( 'MM_FX_Rates' ) ) {
          
          // Get stored options
          $options = get_option( 'mwd_mcer_options' );
-         $currency_options = ( empty( $options['mwd_mcer_field_currencies'] ) ) ? MWD_MCER()->cbm_exchange_rates()->get_default_currencies() : $options['mwd_mcer_field_currencies'];
+         $currency_options = ( ! empty( $options['mwd_mcer_field_currencies'] ) ) 
+            ? $options['mwd_mcer_field_currencies'] 
+            : MWD_MCER()->cbm_exchange_rates()->get_default_currencies();
          
-         $rates = array();
-         $fxrates_body = MWD_MCER()->cbm_exchange_rates()->get_fxrates_body();
-         $rates = $fxrates_body['rates'];
-         $rate_timestamp = $fxrates_body['timestamp'];
+         $fxrates = array();
+         $fxrates = MWD_MCER()->cbm_exchange_rates()->get_fxrates();
+         $rate_timestamp = MWD_MCER()->cbm_exchange_rates()->get_fxtimestamp();
 
          // filter $rates with $currency_options
-         // and add to $fxrates
-         $fxrates = array();
+         // and add to $rates
+         $rates = array();
          foreach ( $currency_options as $option ) {
-            if ( isset( $rates[$option] ) )
-               $fxrates[$option] = $rates[$option];
+            if ( isset( $fxrates[$option] ) )
+               $rates[$option] = $fxrates[$option];
          }
 
-			if ( count( $fxrates ) > 0 ) {
-            // sort the $fxrates
+			if ( count( $rates ) > 0 ) {
+            // sort the $rates
             if ( $instance['order'] === 'name_asc' || $instance['order'] === '--' ) {
                // Sort an array by key.
-               ksort( $fxrates );
+               ksort( $rates );
             } elseif ( $instance['order'] === 'name_desc' ) {
                // Sort an array by key in reverse order.
-               krsort( $fxrates );
+               krsort( $rates );
             } elseif ( ( $instance['order'] === 'rates_asc' ) || ( $instance['order'] === 'rates_desc' ) ) {
                // Remove the `,`.
-               foreach( $fxrates as &$value ) {
+               foreach( $rates as &$value ) {
                   $value = str_replace( ',', '', $value );
                }
 
                if ( $instance['order'] === 'rates_asc' ) {
-                  // sort $fxrates.
-                  asort( $fxrates, SORT_NUMERIC );
+                  // sort $rates.
+                  asort( $rates, SORT_NUMERIC );
                } else {                  
-                  // reverse-sort $fxrates.
-                  arsort( $fxrates, SORT_NUMERIC );
+                  // reverse-sort $rates.
+                  arsort( $rates, SORT_NUMERIC );
                }
 
                // format the numbers
-               foreach( $fxrates as &$value ) {
+               foreach( $rates as &$value ) {
                   $value = number_format( $value, 4 );
                }
             }
@@ -122,12 +123,12 @@ if ( ! class_exists( 'MM_FX_Rates' ) ) {
 					</thead>
 					<tbody>
                   <?php
-                  $d_mode = empty( get_option( 'mwd_mcer_options')['mwd_mcer_field_display_modes'] )
-                     ? 'compact'
-                     : get_option( 'mwd_mcer_options')['mwd_mcer_field_display_modes'];
+                  $d_mode = ( ! empty( $options['mwd_mcer_field_display_modes'] ) ) 
+                     ? $options['mwd_mcer_field_display_modes']
+                     : 'normal';
 
                   if ( $d_mode === 'compact' ) {
-                     foreach ( $fxrates as $key => $value ) :
+                     foreach ( $rates as $key => $value ) :
                      ?>
    
                         <tr style="border:0;">
@@ -145,7 +146,7 @@ if ( ! class_exists( 'MM_FX_Rates' ) ) {
                      // Get fxcurrencies.
                      $fxcurrencies = MWD_MCER()->cbm_exchange_rates()->get_fxcurrencies();
 
-                     foreach ( $fxrates as $key => $value ) :
+                     foreach ( $rates as $key => $value ) :
                      ?>
 
                         <tr style="border:0;">
