@@ -82,13 +82,13 @@ if (!class_exists('MM_FX_Rates')) {
 
          if (count($rates) > 0) {
             // sort the $rates
-            if ($instance['order'] === 'name_asc' || $instance['order'] === '--') {
+            if ($instance['order'] === 'name_asc') {
                // Sort an array by key.
                ksort($rates);
             } elseif ($instance['order'] === 'name_desc') {
                // Sort an array by key in reverse order.
                krsort($rates);
-            } elseif (($instance['order'] === 'rates_asc') || ($instance['order'] === 'rates_desc')) {
+            } elseif (($instance['order'] === 'rates_asc') || ($instance['order'] === 'rates_desc') || $instance['order'] === '--') {
                // Remove the `,`.
                foreach ($rates as &$value) {
                   $value = str_replace(',', '', $value);
@@ -104,7 +104,7 @@ if (!class_exists('MM_FX_Rates')) {
 
                // format the numbers
                foreach ($rates as &$value) {
-                  $value = number_format($value, 4);
+                  $value = number_format($value, 2);
                }
             }
 ?>
@@ -213,15 +213,17 @@ if (!class_exists('MM_FX_Rates')) {
          <p>
             <label for="<?php echo $this->get_field_id('order'); ?>"><?php _e('Order by: ', 'myanmar-exchange-rates'); ?></label>
             <select name="<?php echo $this->get_field_name('order'); ?>" id="<?php echo $this->get_field_id('order'); ?>" class="widefat">
-               <option value="--" <?php echo ($order === 'name_asc') ? ' selected ' : ''; ?>><?php esc_html_e('---'); ?></option>
-               <option value="name_asc" <?php echo ($order === 'name_asc') ? ' selected ' : ''; ?>><?php esc_html_e('Name ASC', 'myanmar-exchange-rates'); ?></option>
-               <option value="name_desc" <?php echo ($order === 'name_desc') ? ' selected ' : ''; ?>><?php esc_html_e('Name DESC', 'myanmar-exchange-rates'); ?></option>
-               <option value="rates_asc" <?php echo ($order === 'rates_asc') ? ' selected ' : ''; ?>><?php esc_html_e('Rates ASC', 'myanmar-exchange-rates'); ?></option>
-               <option value="rates_desc" <?php echo ($order === 'rates_desc') ? ' selected ' : ''; ?>><?php esc_html_e('Rates DESC', 'myanmar-exchange-rates'); ?></option>
+               <!-- <option value="--" <?php //echo ($order === 'name_asc') ? ' selected ' : ''; 
+                                       ?>><?php //esc_html_e('---'); 
+                                          ?></option> -->
+               <option value="rates_desc" <?php echo (empty($order) || $order === 'rates_desc') ? ' selected ' : ''; ?>><?php esc_html_e('Rates: DESC', 'myanmar-exchange-rates'); ?></option>
+               <option value="rates_asc" <?php echo ($order === 'rates_asc') ? ' selected ' : ''; ?>><?php esc_html_e('Rates: ASC', 'myanmar-exchange-rates'); ?></option>
+               <option value="name_asc" <?php echo ($order === 'name_asc') ? ' selected ' : ''; ?>><?php esc_html_e('Name: Z » A', 'myanmar-exchange-rates'); ?></option>
+               <option value="name_desc" <?php echo ($order === 'name_desc') ? ' selected ' : ''; ?>><?php esc_html_e('Name: A » Z', 'myanmar-exchange-rates'); ?></option>
             </select>
          </p>
          <p>
-            <a href="<?php menu_page_url('mwd_mcer'); ?>" title="Setting options"><?php _e('Configure', 'myanmar-exchange-rates'); ?></a>
+            <a style="text-decoration: none;" href="<?php menu_page_url('mwd_mcer'); ?>" title="Setting options"><span class="dashicons dashicons-admin-settings"></span> <?php _e('Configure', 'myanmar-exchange-rates'); ?></a>
          </p>
 <?php
       }

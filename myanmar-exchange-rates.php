@@ -68,7 +68,7 @@ function mwd_mcer_deactivate()
 {
    unregister_widget('MM_FX_Rates');
 }
-register_activation_hook(__FILE__, 'mwd_mcer_deactivate');
+register_deactivation_hook(__FILE__, 'mwd_mcer_deactivate');
 
 /**
  * Begin execution of the plugin.

@@ -57,7 +57,7 @@ class Myanmar_Exchange_Rates_Admin
    function mwd_mcer_option_page() {
       // Add plugin option page
       $hookname = add_options_page(
-         __('Myanmar Currency Exchange Rates Options', 'myanmar-exchange-rates'),
+         __('Myanmar Currency Exchange Rates by MWD', 'myanmar-exchange-rates'),
          __('Myanmar Currency Exchange Rates', 'myanmar-exchange-rates'),
          'manage_options',
          'mwd_mcer',
@@ -116,27 +116,20 @@ class Myanmar_Exchange_Rates_Admin
 
       // Register a new section in the 'mwd_mcer' page
       // Choose display mode section.
-      add_settings_section(
-         'mwd_mcer_section_display_modes',
-         __( 'Choose display mode.', 'myanmar-exchange-rates' ),
-         [ $this, 'mwd_mcer_section_display_modes_callback' ],
-         'mwd_mcer'
-      );
+      // add_settings_section(
+      //    'mwd_mcer_section_display_modes',
+      //    __( 'Choose display mode.', 'myanmar-exchange-rates' ), [ $this, 'mwd_mcer_section_display_modes_callback' ], 'mwd_mcer');
+      add_settings_section( 'mwd_mcer_section_display_modes', __( '', 'myanmar-exchange-rates' ), [ $this, 'mwd_mcer_section_display_modes_callback' ], 'mwd_mcer');
 
       // Register a new section in the 'mwd_mcer' page
       // Select currencies to show section.
-      add_settings_section(
-         'mwd_mcer_section_choose_currency',
-         __( 'Select the currencies to show.', 'myanmar-exchange-rates'),
-         [ $this, 'mwd_mcer_section_choose_currency_callback' ],
-         'mwd_mcer'
-      );
+      add_settings_section( 'mwd_mcer_section_choose_currency', __( '', 'myanmar-exchange-rates'), [ $this, 'mwd_mcer_section_choose_currency_callback' ], 'mwd_mcer');
 
       // Add new field to the section of 'mwd_mcer' page
       // Select currencies field.
       add_settings_field(
          'mwd_mcer_field_currencies',
-         __( 'Select Currencies', 'myanmar-exchange-rates' ),
+         __( 'Select Currencies to Display', 'myanmar-exchange-rates' ),
          [ $this, 'mwd_mcer_field_currencies_callback' ],
          'mwd_mcer',
          'mwd_mcer_section_choose_currency',
@@ -150,7 +143,7 @@ class Myanmar_Exchange_Rates_Admin
       // Display modes field.
       add_settings_field(
          'mwd_mcer_field_display_modes',
-         __( 'Display Modes', 'myanmar-exchange-rates' ),
+         __( 'Display Mode', 'myanmar-exchange-rates' ),
          [ $this, 'mwd_mcer_field_display_modes_callback' ],
          'mwd_mcer',
          'mwd_mcer_section_display_modes',
