@@ -44,7 +44,13 @@ define( 'MYANMAR_EXCHANGE_RATES_VERSION', '1.0' );
  */
 require plugin_dir_path( __FILE__ ) . 'includes/class-myanmar-exchange-rates.php';
 
-// When Activate the plugin
+/**
+ * Activation callback function.
+ * 
+ * When Activate the plugin
+ * 
+ * @since   1.0
+ */
 function mwd_mcer_activate()
 {
 	mwd_mcer_register_widgets();
@@ -62,12 +68,18 @@ function mwd_mcer_register_widgets()
 }
 add_action( 'widgets_init', 'mwd_mcer_register_widgets' );
 
-// When Deactivate the plugin
+/**
+ * Deactivation callback function.
+ * 
+ * When Deactivate the plugin
+ * 
+ * @since   1.0
+ */
 function mwd_mcer_deactivate()
 {
-	unregister_widget('mm_fx_rates');
+	unregister_widget( 'MM_FX_Rates' );
 }
-register_activation_hook(__FILE__, 'mwd_mcer_deactivate');
+register_deactivation_hook( __FILE__, 'mwd_mcer_deactivate' );
 
 /**
  * Begin execution of the plugin.
@@ -95,3 +107,18 @@ function MWD_MCER()
 {
    return Myanmar_Exchange_Rates::instance();
 }
+
+/**
+ * Add setting action lins on plugins list page.
+ * 
+ * @since   1.0
+ */ 
+function mwd_mcer_add_action_links( $actions ) {
+   $mylinks = array(
+      '<a href="' . admin_url( 'options-general.php?page=mwd_mcer' ) . '">Settings</a>',
+   );
+   
+   $actions = array_merge( $actions, $mylinks );
+   return $actions;
+}
+add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), 'mwd_mcer_add_action_links' );

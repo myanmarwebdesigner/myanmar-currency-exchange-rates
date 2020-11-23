@@ -261,16 +261,6 @@ class Myanmar_Exchange_Rates_Admin
    }
 
    /**
-    * Register the stylesheets for the admin area.
-    *
-    * @since   1.0
-    */
-   public function enqueue_styles()
-   {
-      wp_enqueue_style( 'mwd-mcer-admin-styles', plugin_dir_url( __FILE__ ) . 'css/mwd-mcer-admin.css', array(), $this->version );
-   }
-
-   /**
     * Register the JavaScript for the admin area.
     *
     * @since   1.0

@@ -217,7 +217,7 @@ if ( ! class_exists( 'MM_FX_Rates' ) ) {
             </select>
          </p>
          <p>
-            <a href="<?php menu_page_url( 'mwd_mcer' ); ?>" title="Setting options"><?php _e('Configure', 'myanmar-exchange-rates' ); ?></a>
+            <a href="<?php echo admin_url( 'options-general.php?page=mwd_mcer' ); ?>" title="Setting options"><?php _e('Configure', 'myanmar-exchange-rates' ); ?></a>
          </p>
 			<?php
 		}
