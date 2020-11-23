@@ -164,6 +164,9 @@ class Myanmar_Exchange_Rates_Admin
       // Latest exchange-rates.
       $fxrates = MWD_MCER()->cbm_exchange_rates()->get_fxrates();
 
+      // Sort $fxrates ASC order by Name.
+      ksort( $fxrates );
+
       // Get the value of the setting we've registered with register_setting().
       $options = get_option( 'mwd_mcer_options' );
       $currency_options = ( ! isset( $options[$args['name']] ) || empty( $options[$args['name']] ) ) ? MWD_MCER()->cbm_exchange_rates()->get_default_currencies() : $options[$args['name']];
