@@ -218,8 +218,8 @@ if (!class_exists('MM_FX_Rates')) {
                                           ?></option> -->
                <option value="rates_desc" <?php echo (empty($order) || $order === 'rates_desc') ? ' selected ' : ''; ?>><?php esc_html_e('Rates: DESC', 'myanmar-exchange-rates'); ?></option>
                <option value="rates_asc" <?php echo ($order === 'rates_asc') ? ' selected ' : ''; ?>><?php esc_html_e('Rates: ASC', 'myanmar-exchange-rates'); ?></option>
-               <option value="name_asc" <?php echo ($order === 'name_asc') ? ' selected ' : ''; ?>><?php esc_html_e('Name: Z » A', 'myanmar-exchange-rates'); ?></option>
-               <option value="name_desc" <?php echo ($order === 'name_desc') ? ' selected ' : ''; ?>><?php esc_html_e('Name: A » Z', 'myanmar-exchange-rates'); ?></option>
+               <option value="name_asc" <?php echo ($order === 'name_asc') ? ' selected ' : ''; ?>><?php esc_html_e('Name: A » Z', 'myanmar-exchange-rates'); ?></option>
+               <option value="name_desc" <?php echo ($order === 'name_desc') ? ' selected ' : ''; ?>><?php esc_html_e('Name: Z » A', 'myanmar-exchange-rates'); ?></option>
             </select>
          </p>
          <p>
