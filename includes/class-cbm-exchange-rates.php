@@ -106,32 +106,31 @@ class CBM_Exchange_Rates
     * from `Central Banks of Myanmar`.
     *
     * @since   1.0
+    * @since   2.0.0 Used wp transient instead of wp options
     * @access  private
-    * @return  array If ok Retrun response body array, else empty array.
+    * @return  array Retrun exchange rates, or empty array.
     */
    private function get_latest_fxrates_body()
    {
-      // Get latest exchange-rates from the Central Banks of Myanmar.
-      $response = wp_remote_get( 'http://forex.cbm.gov.mm/api/latest' );
-      $response_code = wp_remote_retrieve_response_code( $response );      
-      $response_body = wp_remote_retrieve_body( $response );
+      // Get any existing copy of our transient data ( exchange rates )
+      if ( false === ( $fxrates = get_transient( 'mwd_mcer_fxrates' ) ) ) {
+         // It wasn't there, so regenerate the data and save the transient
+         // Get latest exchange-rates from the Central Banks of Myanmar.
+         $response = wp_remote_get( 'http://forex.cbm.gov.mm/api/latest' );
+         $response_code = wp_remote_retrieve_response_code( $response );      
+         $response_body = wp_remote_retrieve_body( $response );
 
-      if ( $response_code === 200 ) {
-         // Decode to PHP's associative array.
-         $response_body = json_decode( $response_body, true );
-         
-         // Check and update if $response_body is up to date.
-         $option_timestamp = get_option( 'mwd_mcer_latest_fxrates' ) ? get_option( 'mwd_mcer_latest_fxrates' )['timestamp'] : '';
-
-         if ( $option_timestamp != $response_body['timestamp'] ) {
-            update_option( 'mwd_mcer_latest_fxrates', $response_body );
+         if ( $response_code === 200 ) {
+            // Decode to PHP's associative array.
+            $fxrates = json_decode( $response_body, true );
+            
+            set_transient( 'mwd_mcer_fxrates', $fxrates, 12 * HOUR_IN_SECONDS );
+         } else {
+            $fxrates = array();
          }
-      } else {
-         // Get option-response-body.
-         $response_body = get_option( 'mwd_mcer_latest_fxrates', array() ) ;
       }
 
-      return $response_body;
+      return $fxrates;
    }
 
    /**
@@ -139,29 +138,28 @@ class CBM_Exchange_Rates
     * from the `Central Banks of Myanmar`.
     *
     * @since   1.0
+    * @since   2.0.0 Used wp transient instead of wp options
     * @access  private
-    * @return  array If exist return the exchange-currencies else empty array.
+    * @return  array Return exchange currencies, or empty array.
     */
    private function get_latest_fxcurrencies()
    {
-      // Get the latest currencies from Central Banks of Myanmar.
-      $response = wp_remote_get( 'https://forex.cbm.gov.mm/api/currencies' );
-      $response_code = wp_remote_retrieve_response_code( $response );      
-      $response_body = wp_remote_retrieve_body( $response );
-      
-      if ( $response_code === 200 ) {
-         // Decode to PHP associative array.
-         $fxcurrencies = isset( json_decode( $response_body, true )['currencies'] ) ? json_decode( $response_body, true )['currencies'] : array();
+      // Get any existing copy of our transient data ( exchange currencies )
+      if ( false === ( $fxcurrencies = get_transient( 'mwd_mcer_fxcurrencies' ) ) ) {
+         // It wasn't there, so regenerate the data and save the transient
+         // Get the latest currencies from Central Banks of Myanmar.
+         $response = wp_remote_get( 'https://forex.cbm.gov.mm/api/currencies' );
+         $response_code = wp_remote_retrieve_response_code( $response );      
+         $response_body = wp_remote_retrieve_body( $response );
 
-         // Retrieve stored `fxcurrencies`.
-         $option_fxcurrencies = get_option( 'mwd_mcer_fxcurrencies', array() );
-
-         if ( count( array_diff_assoc( $fxcurrencies, $option_fxcurrencies ) ) > 0 ) {
-            update_option( 'mwd_mcer_fxcurrencies', $fxcurrencies );
+         if ( $response_code === 200 ) {
+            // Decode to PHP associative array.
+            $fxcurrencies = isset( json_decode( $response_body, true )['currencies'] ) ? json_decode( $response_body, true )['currencies'] : array();
+   
+            set_transient( 'mwd_mcer_fxcurrencies', $fxcurrencies, 1 * MONTH_IN_SECONDS );
+         } else {
+            $fxcurrencies = array();
          }
-      } else {
-         // Retrieve stored `fxcurrencies`.
-         $fxcurrencies = get_option( 'mwd_mcer_fxcurrencies', array() );
       }
       
       return $fxcurrencies;

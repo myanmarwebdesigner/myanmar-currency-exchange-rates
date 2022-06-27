@@ -45,6 +45,9 @@ if (!class_exists('MM_FX_Rates')) {
 
       /**
        * The widget's HTML output.
+       * 
+       * @since 1.0.0
+       * @since 2.0.0 Upgraded number format from fixed to dynamic decimals but without unnecessary zeros. 
        *
        * @see WP_Widget::widget()
        *
@@ -94,6 +97,8 @@ if (!class_exists('MM_FX_Rates')) {
                   $value = str_replace(',', '', $value);
                }
 
+               unset( $value ); // break the reference with the last element
+
                if ($instance['order'] === 'rates_asc') {
                   // sort $rates.
                   asort($rates, SORT_NUMERIC);
@@ -104,8 +109,10 @@ if (!class_exists('MM_FX_Rates')) {
 
                // format the numbers
                foreach ($rates as &$value) {
-                  $value = number_format($value, 2);
+                  $value = $this->num_format( $value );
                }
+
+               unset( $value ); // break the reference with the last element
             }
 ?>
 
@@ -218,14 +225,41 @@ if (!class_exists('MM_FX_Rates')) {
                                           ?></option> -->
                <option value="rates_desc" <?php echo (empty($order) || $order === 'rates_desc') ? ' selected ' : ''; ?>><?php esc_html_e('Rates: DESC', 'myanmar-exchange-rates'); ?></option>
                <option value="rates_asc" <?php echo ($order === 'rates_asc') ? ' selected ' : ''; ?>><?php esc_html_e('Rates: ASC', 'myanmar-exchange-rates'); ?></option>
-               <option value="name_asc" <?php echo ($order === 'name_asc') ? ' selected ' : ''; ?>><?php esc_html_e('Name: A » Z', 'myanmar-exchange-rates'); ?></option>
                <option value="name_desc" <?php echo ($order === 'name_desc') ? ' selected ' : ''; ?>><?php esc_html_e('Name: Z » A', 'myanmar-exchange-rates'); ?></option>
+               <option value="name_asc" <?php echo ($order === 'name_asc') ? ' selected ' : ''; ?>><?php esc_html_e('Name: A » Z', 'myanmar-exchange-rates'); ?></option>
             </select>
          </p>
          <p>
             <a style="text-decoration: none;" href="<?php echo admin_url('options-general.php?page=mwd_mcer'); ?>" title="Setting options"><span class="dashicons dashicons-admin-settings"></span> <?php _e('Configure', 'myanmar-exchange-rates'); ?></a>
          </p>
 <?php
+      }
+
+
+      /**
+      * Remove unnecessary zeros.
+      * 
+      * Same as number_format() but without unnecessary zeros.
+      * 
+      * @since 2.0.0
+      * 
+      * @param float $num Number to format.
+      * @return float
+      */
+      public function num_format( $num )
+      {
+         $ret = number_format( $num, 10 );
+
+         while( substr( $ret, -1 ) === "0" ) {
+               // if number ends with a '0', remove '0' from end of string
+               $ret = substr( $ret, 0, -1 );
+         }
+
+         if ( substr( $ret,-1 ) === '.' ) {
+               $ret = substr( $ret, 0, -1 );
+         }
+
+         return $ret;
       }
    }
 }

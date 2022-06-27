@@ -1,11 +1,11 @@
 === Myanmar Currency Exchange Rates ===
 Contributors: myanmarwd
-Tags: Forex, Fx rate, Currency Exchange Rate, Exchange Rate, Financial
+Tags: Myanmar, Burmese, Forex, Fx rate, Currency Exchange Rate, Exchange Rate, Financial
 Donate link: https://www.myanmarwebdesigner.com/
 Requires at least: 2.7.0
-Tested up to: 5.5.3
-Requires PHP: 5.4
-Stable tag: 1.0.1
+Tested up to: WordPress 6.0
+Requires PHP: 7.0
+Stable tag: 2.0
 License: GPL v2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -13,6 +13,14 @@ Myanmar daily foreign exchange (forex) rates WordPress plugin. This plugin gets 
 
 == Description ==
 Myanmar daily foreign exchange (forex) rates WordPress plugin. This plugin gets daily currency exchange rates from Central Bank of Myanmar (CBM).
+
+You can use
+
+1. plugin setting page inside WordPress dashboard
+2. the shortcode
+3. or the template tag
+
+to display the currency exchange rate on you WordPress site.
 
 == Installation ==
 
@@ -25,9 +33,7 @@ Myanmar daily foreign exchange (forex) rates WordPress plugin. This plugin gets 
 
 = Can I add the exchange rates table inside the page? =
 
-If you are using page builder plugins, then yes. You can just choose the widget at your favorite block and the exchange rates table will appear neatly.
-
-If you are not using any page builder plugins, the shortcode functionality is coming soon in next versions.
+Yes, you can use `[mm_fxrates]` shortcode to display the exchange rates table on any page.
 
 == Screenshots ==
 
@@ -38,9 +44,20 @@ If you are not using any page builder plugins, the shortcode functionality is co
 
 == Changelog ==
 
+= 2.0 =
+
+- Update the plugin to make it compatible with WordPress 6.0
+- Added `[mm_fxrates]` shortcode. Now you can display the exchange rates table anywhere on the page
+- Added template tag so that you can use it to display the exchange rates table inside theme's php files
+
 = 1.0 =
 
 - Initial release of Myanmar Currency Exchange Rates WordPress plugin.
+
+== Upgrade Notice ==
+
+= 2.0 =
+Since we have added 2 more ways to display the exchange rates table and made the plugin compatible with WordPress 6.0, you should upgrade it as soon as possible.
 
 == To Contact The Developer ==
 

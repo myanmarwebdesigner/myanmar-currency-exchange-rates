@@ -70,6 +70,7 @@ final class Myanmar_Exchange_Rates
     * Define the core functionality of the plugin.
     *
     * @since   1.0
+    * @since 2.0.0 Added define_public_hooks().
     */
    public function __construct()
    {
@@ -82,6 +83,7 @@ final class Myanmar_Exchange_Rates
 
       $this->load_dependencies();
       $this->define_admin_hooks();
+      $this->define_public_hooks();
    }
 
    /**
@@ -90,6 +92,7 @@ final class Myanmar_Exchange_Rates
     * Include the following files that makeup the plugin:
     *
     * @since   1.0
+    * @since 2.0.0 Added shortcode class file.
     * @access  private
     */
    private function load_dependencies()
@@ -109,6 +112,9 @@ final class Myanmar_Exchange_Rates
       // The class responsible for defining widget
       require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-cbm-exchange-rates.php';
 
+      // The class responsible for defining shortcode.
+      require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/shortcodes/class-shortcode-fx-rates.php';
+
       $this->loader = new Myanmar_Exchange_Rates_Loader();
    }
 
@@ -127,6 +133,21 @@ final class Myanmar_Exchange_Rates
       $this->loader->add_action('admin_menu', $plugin_admin, 'mwd_mcer_option_page');
       $this->loader->add_action('admin_init', $plugin_admin, 'mwd_mcer_settings_init');
    }
+   
+
+   /**
+    * Register public hooks
+    *
+    * Public hooks related to the public area functionality of the plugin.
+    *
+    * @since 2.0.0
+    * @access  private
+    */
+   private function define_public_hooks()
+   {
+      $this->loader->add_action( 'init', new Shortcode_FX_Rates(), 'mm_fxrates_shortcodes_init' );
+   }
+
 
    /**
     * Return the instance of CBM_Exchange_Rates.
